@@ -5,59 +5,66 @@ import axios from "axios";
 import events from "events";
 import { Server } from "socket.io";
 import { formatObject, parseXML, detectViolation } from "./helpers.mjs";
-import { eventHandler } from "./data/fetchData.mjs";
+import { eventHandler, pushToDb } from "./data/fetchData.mjs";
+import { createConnection } from "./Data/db.mjs";
 dotenv.config();
 
-// Base api URL
+// Base url
 const baseURL = process.env.BASE_URL;
 const pilotURL = process.env.PILOT_URL;
-// Create express app
-const app = express();
+
 // Create server
+const app = express();
 const server = http.createServer(app);
-// Create socket server
 const io = new Server(server, {
 	cors: { origin: "*" },
 });
 
-// Global variables
 const DELAY = 2000;
 const PORT = process.env.PORT || 3002;
-let violations;
 
-// Declare event emmiter
-const eventEmmiter = new events.EventEmitter();
+export const eventEmmiter = new events.EventEmitter();
 
-// Fetch data every 2 seconds
-setTimeout(async function run() {
+// Event Listeners
+eventEmmiter.on("violations", (violations) =>
+	eventHandler(pilotURL, violations, io)
+);
+eventEmmiter.on("push", (data) => pushToDb(data));
+
+// Start function
+const start = async () => {
 	try {
-		const result = await axios(baseURL);
-		// Parse XML to JS
-		const jsonData = await parseXML(result.data);
-		// Re-arrange the object shape and calculate the distance to the nest for each drone
-		const drones = formatObject(jsonData);
-		// Filter violations
-		violations = detectViolation(drones);
+		await createConnection();
+		console.log("Connected to db...");
 
-		// if there is a violation emmit an event
-		if (violations.length > 0) {
-			eventEmmiter.emit("violations");
-		}
+		server.listen(PORT, () => {
+			console.log(`server listening on port ${PORT}...`);
+		});
 
-		// Publish the data to all clients
-		io.emit("drone-data", drones);
+		setTimeout(async function run() {
+			try {
+				const result = await axios(baseURL);
+				const jsonData = await parseXML(result.data);
+				const drones = formatObject(jsonData);
+				const violations = detectViolation(drones);
 
-		// Call the run() again
-		setTimeout(run, DELAY);
+				if (violations.length > 0) {
+					eventEmmiter.emit("violations", violations);
+				}
+
+				io.emit("drone-data", drones);
+
+				// Call the run() again
+				setTimeout(run, DELAY);
+			} catch (error) {
+				setTimeout(run, 500);
+				console.error(error.response.statusText);
+			}
+		}, DELAY);
 	} catch (error) {
-		setTimeout(run, 500);
-		console.error(error.response.statusText);
+		console.log("something went wrong");
 	}
-}, DELAY);
+};
 
-// Call the event handler when a new violation happens
-eventEmmiter.on("violations", () => eventHandler(pilotURL, violations, io));
-
-server.listen(PORT, () => {
-	console.log(`server listening on port ${PORT}...`);
-});
+// Start the app
+start();
