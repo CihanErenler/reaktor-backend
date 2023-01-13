@@ -1,5 +1,6 @@
 import axios from "axios";
 import { eventEmmiter } from "../server.mjs";
+import Pilot from "../Models/PilotModel.mjs";
 
 export const eventHandler = async (pilotURL, violations, socket) => {
 	const calls = violations.map((v) => {
@@ -33,4 +34,23 @@ export const eventHandler = async (pilotURL, violations, socket) => {
 		});
 };
 
-export const pushToDb = async (data) => {};
+export const pushToDb = async (data) => {
+	data.forEach(async (pilot) => {
+		try {
+			const response = await Pilot.findOne({ pilotId: pilot.pilotId });
+			if (!response) {
+				const { pilotId, firstName, lastName, phoneNumber, email } = pilot;
+				const newPilot = new Pilot({
+					pilotId,
+					firstName,
+					lastName,
+					phoneNumber,
+					email,
+				});
+				await newPilot.save();
+			}
+		} catch (error) {
+			console.log(error);
+		}
+	});
+};

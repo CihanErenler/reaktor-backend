@@ -7,6 +7,7 @@ import { Server } from "socket.io";
 import { formatObject, parseXML, detectViolation } from "./helpers.mjs";
 import { eventHandler, pushToDb } from "./data/fetchData.mjs";
 import { createConnection } from "./Data/db.mjs";
+import PilotsRouter from "./Routers/PilotRouter.mjs";
 dotenv.config();
 
 // Base url
@@ -19,6 +20,9 @@ const server = http.createServer(app);
 const io = new Server(server, {
 	cors: { origin: "*" },
 });
+
+// router
+app.use("/api/1", PilotsRouter);
 
 const DELAY = 2000;
 const PORT = process.env.PORT || 3002;
@@ -58,7 +62,9 @@ const start = async () => {
 				setTimeout(run, DELAY);
 			} catch (error) {
 				setTimeout(run, 500);
-				console.error(error.response.statusText);
+				if (error.message) {
+					console.log(error.message);
+				}
 			}
 		}, DELAY);
 	} catch (error) {

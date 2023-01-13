@@ -21,10 +21,10 @@ const Pilot = new mongoose.Schema({
 		type: String,
 		require: true,
 	},
-	expireAt: {
+	createdAt: {
 		type: Date,
 		default: Date.now,
-		expires: 5,
+		expires: 600,
 	},
 });
 
