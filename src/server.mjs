@@ -3,9 +3,18 @@ import http from "http";
 import dotenv from "dotenv";
 import axios from "axios";
 import events from "events";
+import cors from "cors";
 import { Server } from "socket.io";
-import { formatObject, parseXML, detectViolation } from "./helpers.mjs";
-import { eventHandler, pushToDb } from "./data/fetchData.mjs";
+import {
+	formatObject,
+	parseXML,
+	detectViolation,
+} from "./Helpers/dataManipulators.mjs";
+import {
+	handleViolations,
+	pushToDb,
+	sendViolationsToClient,
+} from "./Helpers/eventHandlers.mjs";
 import { createConnection } from "./Data/db.mjs";
 import PilotsRouter from "./Routers/PilotRouter.mjs";
 dotenv.config();
@@ -21,6 +30,9 @@ const io = new Server(server, {
 	cors: { origin: "*" },
 });
 
+// Middlewares
+app.use(cors());
+
 // router
 app.use("/api/1", PilotsRouter);
 
@@ -31,9 +43,10 @@ export const eventEmmiter = new events.EventEmitter();
 
 // Event Listeners
 eventEmmiter.on("violations", (violations) =>
-	eventHandler(pilotURL, violations, io)
+	handleViolations(pilotURL, violations, io)
 );
-eventEmmiter.on("push", (data) => pushToDb(data));
+eventEmmiter.on("push", (data) => pushToDb(data, io));
+eventEmmiter.on("updateClient", () => sendViolationsToClient(io));
 
 // Start function
 const start = async () => {

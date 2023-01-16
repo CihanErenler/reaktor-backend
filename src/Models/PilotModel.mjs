@@ -21,10 +21,18 @@ const Pilot = new mongoose.Schema({
 		type: String,
 		require: true,
 	},
-	createdAt: {
+	droneId: {
+		type: String,
+		require: true,
+	},
+	lastSeen: {
 		type: Date,
 		default: Date.now,
 		expires: 600,
+	},
+	createdAt: {
+		type: Date,
+		default: Date.now,
 	},
 });
 
