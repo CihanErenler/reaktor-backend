@@ -98,7 +98,7 @@ export const setDrones = async (data, socket) => {
 
 	try {
 		data.forEach(async (drone) => {
-			if (Number(drone.distanceToNest) < closestDistance) {
+			if (Number(drone.distanceToNest) < Number(closestDistance)) {
 				const response = await Drone.find({});
 				await Drone.findOneAndUpdate(
 					{ _id: response[0]._id },
