@@ -5,9 +5,14 @@ const Drone = new mongoose.Schema({
 		type: Number,
 		require: true,
 	},
+	serialNumber: {
+		type: String,
+		require: true,
+	},
 	lastSeenAt: {
 		type: Date,
 		default: Date.now,
+		expire: 600,
 	},
 });
 

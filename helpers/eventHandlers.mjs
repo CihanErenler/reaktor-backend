@@ -78,35 +78,16 @@ export const sendViolationsToClient = async (socket) => {
 };
 
 export const setDrones = async (data, socket) => {
-	if (!closestDistance) {
-		try {
-			const response = await Drone.find({});
-			if (response.length === 0) {
-				const newDrone = new Drone({
-					distanceToNest: Number(data[0].distanceToNest),
-				});
-				await newDrone.save();
-				closestDistance = Number(data[0].distanceToNest);
-			} else {
-				closestDistance = response[0].distanceToNest;
-			}
-		} catch (error) {
-			console.log(error);
-		}
-	}
-
 	try {
 		data.forEach(async (drone) => {
-			if (Number(drone.distanceToNest) < Number(closestDistance)) {
-				const response = await Drone.find({});
-				await Drone.findOneAndUpdate(
-					{ _id: response[0]._id },
-					{ distanceToNest: Number(data[0].distanceToNest) }
-				);
-				closestDistance = Number(data[0].distanceToNest);
-				socket.emit("closestDistance", Number(drone.distanceToNest));
-			}
+			const newDrone = new Drone({
+				serialNumber: drone.serialNumber,
+				distanceToNest: Number(drone.distanceToNest),
+			});
+			await newDrone.save();
 		});
+		const response = await Drone.find({}).sort("distanceToNest").limit(1);
+		socket.emit("closestDistance", response);
 	} catch (error) {
 		console.log(error);
 	}
