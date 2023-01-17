@@ -1,7 +1,7 @@
 import axios from "axios";
 import { eventEmitter } from "../server.mjs";
-import Pilot from "../Models/PilotModel.mjs";
-import Drone from "../Models/DroneModel.mjs";
+import Pilot from "../models/PilotModel.mjs";
+import Drone from "../models/DroneModel.mjs";
 let closestDistance = null;
 
 export const handleViolations = async (pilotURL, violations, socket) => {

@@ -1,6 +1,6 @@
 import express from "express";
-import { getClosestDistance } from "../Controller/droneController.mjs";
-import { getPilots } from "../Controller/pilotsController.mjs";
+import { getClosestDistance } from "../controller/droneController.mjs";
+import { getPilots } from "../controller/pilotsController.mjs";
 
 const router = express.Router();
 

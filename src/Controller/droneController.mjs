@@ -1,4 +1,4 @@
-import Drone from "../Models/DroneModel.mjs";
+import Drone from "../models/DroneModel.mjs";
 
 export const getClosestDistance = async (req, res) => {
 	try {

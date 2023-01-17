@@ -1,5 +1,4 @@
-import mongoose from "mongoose";
-import Pilot from "../Models/PilotModel.mjs";
+import Pilot from "../models/PilotModel.mjs";
 
 export const getPilots = async (req, res) => {
 	try {

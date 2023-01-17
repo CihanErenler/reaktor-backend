@@ -9,15 +9,15 @@ import {
 	formatObject,
 	parseXML,
 	detectViolation,
-} from "./Helpers/dataManipulators.mjs";
+} from "./helpers/dataManipulators.mjs";
 import {
 	handleViolations,
 	pushToDb,
 	sendViolationsToClient,
 	setDrones,
-} from "./Helpers/eventHandlers.mjs";
-import { createConnection } from "./Data/db.mjs";
-import PilotsRouter from "./Routers/PilotRouter.mjs";
+} from "./helpers/eventHandlers.mjs";
+import { createConnection } from "./db/db.mjs";
+import PilotsRouter from "./routers/PilotRouter.mjs";
 
 dotenv.config();
 
