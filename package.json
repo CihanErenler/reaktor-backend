@@ -15,7 +15,7 @@
 	"scripts": {
 		"dev": "nodemon index.mjs",
 		"build": "rm -rf ./dist && webpack --config ./webpack.config.mjs",
-		"start": "node ./dist/main.js"
+		"start": "node ./dist/server.js"
 	},
 	"keywords": [],
 	"author": "",
