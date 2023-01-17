@@ -4,7 +4,7 @@ import webpackNodeExternals from "webpack-node-externals";
 export default {
 	target: "async-node",
 	entry: {
-		main: "./src/index.mjs",
+		main: "./index.mjs",
 	},
 	mode: "production",
 	node: {

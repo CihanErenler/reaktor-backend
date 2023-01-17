@@ -13,7 +13,7 @@
 		"xml2js": "^0.4.23"
 	},
 	"scripts": {
-		"dev": "nodemon ./src/index.mjs",
+		"dev": "nodemon index.mjs",
 		"build": "rm -rf ./dist && webpack --config ./webpack.config.mjs",
 		"start": "node ./dist/main.js"
 	},
