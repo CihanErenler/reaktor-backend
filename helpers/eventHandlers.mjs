@@ -2,7 +2,6 @@ import axios from "axios";
 import { eventEmitter } from "../index.mjs";
 import Pilot from "../models/PilotModel.mjs";
 import Drone from "../models/DroneModel.mjs";
-let closestDistance = null;
 
 export const handleViolations = async (pilotURL, violations, socket) => {
 	const calls = violations.map((v) => {
@@ -83,7 +82,7 @@ export const setDrones = async (data, socket) => {
 		try {
 			const response = await Drone.find({});
 			if (response.length === 0) {
-				const newDrone = Drone({
+				const newDrone = new Drone({
 					distanceToNest: Number(data[0].distanceToNest),
 				});
 				await newDrone.save();
