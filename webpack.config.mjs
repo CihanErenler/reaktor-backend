@@ -4,7 +4,7 @@ import webpackNodeExternals from "webpack-node-externals";
 export default {
 	target: "async-node",
 	entry: {
-		main: "./src/server.mjs",
+		main: "./src/index.mjs",
 	},
 	mode: "production",
 	node: {
@@ -12,17 +12,17 @@ export default {
 		__filename: false,
 	},
 	externals: [webpackNodeExternals()],
-	module: {
-		rules: [
-			{
-				test: /\.m?js$/,
-				exclude: /node_modules/,
-				use: {
-					loader: "babel-loader",
-				},
-			},
-		],
-	},
+	// module: {
+	// 	rules: [
+	// 		{
+	// 			test: /\.m?js$/,
+	// 			exclude: /node_modules/,
+	// 			use: {
+	// 				loader: "babel-loader",
+	// 			},
+	// 		},
+	// 	],
+	// },
 	output: {
 		filename: "server.js",
 		path: fileURLToPath(new URL("dist", import.meta.url)),

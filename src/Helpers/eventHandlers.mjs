@@ -1,5 +1,5 @@
 import axios from "axios";
-import { eventEmitter } from "../server.mjs";
+import { eventEmitter } from "../index.mjs";
 import Pilot from "../models/PilotModel.mjs";
 import Drone from "../models/DroneModel.mjs";
 let closestDistance = null;
