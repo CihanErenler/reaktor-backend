@@ -14,6 +14,11 @@ const Drone = new mongoose.Schema({
 		default: Date.now,
 		expire: 600,
 	},
+	createdAt: {
+		type: Date,
+		default: Date.now,
+		expires: 600,
+	},
 });
 
 export default mongoose.model("Drone", Drone);

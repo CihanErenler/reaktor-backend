@@ -24,11 +24,11 @@ const Pilot = new mongoose.Schema({
 	lastSeenAt: {
 		type: Date,
 		default: Date.now,
-		expires: 600,
 	},
 	createdAt: {
 		type: Date,
 		default: Date.now,
+		expires: 600,
 	},
 });
 
