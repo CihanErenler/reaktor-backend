@@ -8,7 +8,6 @@ const Drone = new mongoose.Schema({
 	lastSeenAt: {
 		type: Date,
 		default: Date.now,
-		expire: 600,
 	},
 });
 
