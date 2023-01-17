@@ -2,7 +2,7 @@ import { fileURLToPath } from "url";
 import webpackNodeExternals from "webpack-node-externals";
 
 export default {
-	target: "async-node",
+	target: "node",
 	entry: {
 		main: "./index.mjs",
 	},
