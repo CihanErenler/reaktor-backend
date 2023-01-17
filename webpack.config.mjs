@@ -3,7 +3,9 @@ import webpackNodeExternals from "webpack-node-externals";
 
 export default {
 	target: "async-node",
-	entry: "./src/server.mjs",
+	entry: {
+		main: "./src/server.mjs",
+	},
 	mode: "production",
 	node: {
 		__dirname: false,
