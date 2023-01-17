@@ -1,6 +1,8 @@
 import axios from "axios";
-import { eventEmmiter } from "../server.mjs";
+import { eventEmitter } from "../server.mjs";
 import Pilot from "../Models/PilotModel.mjs";
+import Drone from "../Models/DroneModel.mjs";
+let closestDistance = null;
 
 export const handleViolations = async (pilotURL, violations, socket) => {
 	const calls = violations.map((v) => {
@@ -24,15 +26,17 @@ export const handleViolations = async (pilotURL, violations, socket) => {
 					return { createdAt: new Date(), ...pilot.data };
 				});
 				// socket.emit("violation", pilots);
-				eventEmmiter.emit("push", pilots);
+				eventEmitter.emit("push", pilots);
 			})
 		)
 		.catch((error) => {
-			if (error.response.status === 429) {
-				handleViolations(pilotURL, violations, socket);
-				return;
+			if (error.response) {
+				if (error.response.status === 429) {
+					handleViolations(pilotURL, violations, socket);
+					return;
+				}
 			}
-			console.error(error.response.statusText);
+			console.log(error);
 		});
 };
 
@@ -42,20 +46,24 @@ export const pushToDb = async (data) => {
 			const response = await Pilot.findOne({ pilotId: pilot.pilotId });
 
 			if (response) {
-				await Pilot.findOneAndUpdate({ lastSeen: Date.now() });
+				await Pilot.findOneAndUpdate(
+					{ pilotId: pilot.pilotId },
+					{ lastSeenAt: Date.now() }
+				);
+			} else {
+				const { pilotId, firstName, lastName, phoneNumber, email } = pilot;
+				const newPilot = new Pilot({
+					pilotId,
+					firstName,
+					lastName,
+					phoneNumber,
+					email,
+				});
+				await newPilot.save();
 			}
-			const { pilotId, firstName, lastName, phoneNumber, email } = pilot;
-			const newPilot = new Pilot({
-				pilotId,
-				firstName,
-				lastName,
-				phoneNumber,
-				email,
-			});
-			await newPilot.save();
 		});
 
-		eventEmmiter.emit("updateClient");
+		eventEmitter.emit("updateClient");
 	} catch (error) {
 		console.log(error);
 	}
@@ -65,6 +73,41 @@ export const sendViolationsToClient = async (socket) => {
 	try {
 		const result = await Pilot.find({}).sort({ createdAt: -1 });
 		socket.emit("violation", result);
+	} catch (error) {
+		console.log(error);
+	}
+};
+
+export const setDrones = async (data, socket) => {
+	if (!closestDistance) {
+		try {
+			const response = await Drone.find({});
+			if (response.length === 0) {
+				const newDrone = Drone({
+					distanceToNest: Number(data[0].distanceToNest),
+				});
+				await newDrone.save();
+				closestDistance = Number(data[0].distanceToNest);
+			} else {
+				closestDistance = response[0].distanceToNest;
+			}
+		} catch (error) {
+			console.log(error);
+		}
+	}
+
+	try {
+		data.forEach(async (drone) => {
+			if (Number(drone.distanceToNest) < closestDistance) {
+				const response = await Drone.find({});
+				await Drone.findOneAndUpdate(
+					{ _id: response[0]._id },
+					{ distanceToNest: Number(data[0].distanceToNest) }
+				);
+				closestDistance = Number(data[0].distanceToNest);
+				socket.emit("closestDistance", Number(drone.distanceToNest));
+			}
+		});
 	} catch (error) {
 		console.log(error);
 	}

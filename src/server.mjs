@@ -14,9 +14,11 @@ import {
 	handleViolations,
 	pushToDb,
 	sendViolationsToClient,
+	setDrones,
 } from "./Helpers/eventHandlers.mjs";
 import { createConnection } from "./Data/db.mjs";
 import PilotsRouter from "./Routers/PilotRouter.mjs";
+
 dotenv.config();
 
 // Base url
@@ -39,14 +41,15 @@ app.use("/api/1", PilotsRouter);
 const DELAY = 2000;
 const PORT = process.env.PORT || 3002;
 
-export const eventEmmiter = new events.EventEmitter();
+export const eventEmitter = new events.EventEmitter();
 
 // Event Listeners
-eventEmmiter.on("violations", (violations) =>
+eventEmitter.on("violations", (violations) =>
 	handleViolations(pilotURL, violations, io)
 );
-eventEmmiter.on("push", (data) => pushToDb(data, io));
-eventEmmiter.on("updateClient", () => sendViolationsToClient(io));
+eventEmitter.on("push", (data) => pushToDb(data, io));
+eventEmitter.on("updateClient", () => sendViolationsToClient(io));
+eventEmitter.on("setDrones", (violations) => setDrones(violations, io));
 
 // Start function
 const start = async () => {
@@ -66,7 +69,8 @@ const start = async () => {
 				const violations = detectViolation(drones);
 
 				if (violations.length > 0) {
-					eventEmmiter.emit("violations", violations);
+					eventEmitter.emit("violations", violations);
+					eventEmitter.emit("setDrones", violations);
 				}
 
 				io.emit("drone-data", drones);
