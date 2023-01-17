@@ -17,7 +17,7 @@ import {
 	setDrones,
 } from "./helpers/eventHandlers.mjs";
 import { createConnection } from "./db/db.mjs";
-import PilotsRouter from "./routers/PilotRouter.mjs";
+import router from "./routers/router.mjs";
 
 dotenv.config();
 
@@ -36,7 +36,7 @@ const io = new Server(server, {
 app.use(cors());
 
 // router
-app.use("/api/1", PilotsRouter);
+app.use("/api/1", router);
 
 const DELAY = 2000;
 const PORT = process.env.PORT || 3002;
